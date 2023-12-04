@@ -1,0 +1,36 @@
+name: Production-App
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Node dependencies
+        working-directory: ./src/app
+        run: npm ci
+      - name: Build
+        working-directory: ./src/app
+        run: npm run buildci
+      - name: Install Chrome manually
+        working-directory: ./src/build
+        run: npm run postinstall
+      - name: Authenticate to Cloud Functions
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          version: '>= 363.0.0'
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+      - name: Deploy
+        run: 'gcloud functions deploy financial-integration --gen2 --source=src/build --runtime=nodejs20 --entry-point=start --memory=2048Mi --region=us-west2 --service-account=330493308301-compute@developer.gserviceaccount.com --timeout=1800s --min-instances=0 --max-instances=3 --trigger-http --allow-unauthenticated'
