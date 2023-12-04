@@ -1,0 +1,25 @@
+{
+  "name": "gcf-puppet",
+  "version": "1.0.0",
+  "description": "Testes Puppeteer on Cloud.",
+  "main": "build/index.js",
+  "scripts": {
+    "buildci": "npm run clean && npm run compile && npm run copy",
+    "clean": "rm -rf ./build",
+    "compile": "npx tsc --outDir ./build",
+    "copy": "npx copyfiles --all '**/*' --exclude '**/*.ts' --exclude 'node_modules' ./build",
+    "postinstall": "node node_modules/puppeteer/install.mjs",
+    "start": "node lib/index"
+  },
+  "keywords": [],
+  "author": "Vinicius Anic4cio",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.3.0",
+    "firebase-functions": "^4.5.0",
+    "puppeteer": "^21.5.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.2"
+  }
+}
